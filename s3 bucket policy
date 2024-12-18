@@ -1,0 +1,43 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "GrantReadAccessToSpecificIAMRoleOrUser",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::211125578268:user/kk_labs_user_921340"
+            },
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::aja-s3-bk/*"
+        }
+    ]
+}
+{
+    "Version": "2008-10-17",
+    "Id": "__default_policy_ID",
+    "Statement": [
+      {
+        "Sid": "__default_statement_ID",
+        "Effect": "Allow",
+        "Principal": {
+          "AWS": "*"
+        },
+        "Action": [
+          "SNS:GetTopicAttributes",
+          "SNS:SetTopicAttributes",
+          "SNS:AddPermission",
+          "SNS:RemovePermission",
+          "SNS:DeleteTopic",
+          "SNS:Subscribe",
+          "SNS:ListSubscriptionsByTopic",
+          "SNS:Publish"
+        ],
+        "Resource": "arn:aws:sns:us-east-1:211125578268:SNS-R",
+        "Condition": {
+          "StringEquals": {
+            "AWS:SourceOwner": "211125578268"
+          }
+        }
+      }
+    ]
+}

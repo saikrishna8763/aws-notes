@@ -1,0 +1,48 @@
+const express = require('express');
+     const WebSocket = require('ws');
+     const bodyParser = require('body-parser');
+     const fs = require('fs');
+     const path = require('path');
+
+     const app = express();
+     const server = require('http').createServer(app);
+     const wss = new WebSocket.Server({ server });
+
+     const DATA_FILE = '/mnt/efs/messages.txt'; // EFS file path
+
+     app.use(bodyParser.json());
+     app.use(express.static('public'));
+
+     app.get('/messages', (req, res) => {
+         fs.readFile(DATA_FILE, 'utf8', (err, data) => {
+             if (err) return res.status(500).send('Error reading messages');
+             res.send(data);
+         });
+     });
+
+     wss.on('connection', (ws) => {
+         console.log('New client connected');
+
+         ws.on('message', (message) => {
+             console.log(`Received: ${message}`);
+             fs.appendFile(DATA_FILE, message + '\n', (err) => {
+                 if (err) console.error('Error saving message:', err);
+             });
+
+             // Broadcast the message to all connected clients
+             wss.clients.forEach((client) => {
+                 if (client.readyState === WebSocket.OPEN) {
+                     client.send(message);
+                 }
+             });
+         });
+
+         ws.on('close', () => {
+             console.log('Client disconnected');
+         });
+     });
+
+     const PORT = process.env.PORT || 3000;
+     server.listen(PORT, () => {
+         console.log(`Server is running on port ${PORT}`);
+     });
